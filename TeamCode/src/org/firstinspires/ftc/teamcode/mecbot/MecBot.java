@@ -20,8 +20,6 @@ public class MecBot {
 
     /*
      * Constants
-     *
-     * TODO: Add some constants for motor type, gear ratio, AxesMap, AxesSign, tangent of roller angle.
      */
 
     private final MotorType MOTOR_TYPE;
