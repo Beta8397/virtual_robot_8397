@@ -9,9 +9,9 @@ public class ArmDemo extends MecBotAutonomous {
 
     ArmRobot bot;
     public void runOpMode(){
-        bot = new ArmRobot();
-        bot.init(hardwareMap);
-        super.setBot(bot);
+        bot = new ArmRobot();           //Create the ArmRobot object
+        bot.init(hardwareMap);          //Initialize the ArmRobot object
+        super.setBot(bot);              //Pass the ArmRobot object to the superclass (MecBotAutonomous) object
         bot.grabber.setPosition(1);
         bot.setPose(48,9,90);
         bot.setHeadingDegrees(90);

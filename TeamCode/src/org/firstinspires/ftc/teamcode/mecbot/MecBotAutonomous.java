@@ -80,16 +80,19 @@ public abstract class MecBotAutonomous extends LinearOpMode {
      * @param propCoeff
      */
     public void turnToHeading(float targetHeadingDegrees, float toleranceDegrees,
-                              float propCoeff) {
+                              float propCoeff, float maxDegreesPerSec) {
         float targetHeadingRadians = targetHeadingDegrees * (float) Math.PI / 180;
         float toleranceRadians = toleranceDegrees * (float) Math.PI / 180;
+        float maxRadiansPerSec = maxDegreesPerSec * (float)Math.PI/180;
         while (opModeIsActive()) {
             bot.updateOdometry();
             float currentHeading = bot.getPose().theta;
             float angleDiff = (float) AngleUtils.normalizeRadians(targetHeadingRadians - currentHeading);
             if (Math.abs(angleDiff) < toleranceRadians) break;
             float va = propCoeff * angleDiff;
-            if (Math.abs(va) > STD_MAX_TURN_SPEED) va = Math.signum(va) * STD_MAX_TURN_SPEED;
+            if (Math.abs(va) > maxRadiansPerSec){
+                va = (float)Math.signum(va) * maxRadiansPerSec;
+            }
             bot.setDriveSpeed(0, 0, va);
         }
         bot.setDrivePower(0, 0, 0);

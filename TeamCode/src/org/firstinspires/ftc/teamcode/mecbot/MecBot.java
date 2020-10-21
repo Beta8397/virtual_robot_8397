@@ -19,11 +19,6 @@ import org.firstinspires.ftc.teamcode.util.AngleUtils;
 public class MecBot {
 
     /*
-     * TODO: Modify MecBot so that it can be used with robots that have different motor types, width, length, wheel
-     * diameter, roller angle, gear ratio, and orientation of Rev Expansion Hub on the robot.
-     */
-
-    /*
      * Constants
      *
      * TODO: Add some constants for motor type, gear ratio, AxesMap, AxesSign, tangent of roller angle.
@@ -34,12 +29,11 @@ public class MecBot {
     private final float TAN_ALPHA;
     private final BNO055Enhanced.AxesMap AXES_MAP;
     private final BNO055Enhanced.AxesSign AXES_SIGN;
+    private final float WHEEL_CIRCUMFERENCE;
+    private final float TICKS_PER_ROTATION;
+    private final float WL_AVG;
 
-
-    public final float WHEEL_CIRCUMFERENCE;
-    public final float TICKS_PER_ROTATION;
     public static final float MAX_TICKS_PER_SECOND = 2500;
-    public final float WL_AVG;
 
     /*
      * Drive Motors
@@ -50,9 +44,7 @@ public class MecBot {
     private DcMotor backRight;
 
     /*
-     * The BNO055IMU (gyro)
-     *
-     * TODO: Make this a BNO055Enhanced
+     * The BNO055Enhanced (gyro)
      */
     BNO055Enhanced imu;
 
@@ -89,13 +81,17 @@ public class MecBot {
         private boolean reversed;
     }
 
-    /*
-     * TODO: Add a constructor which takes parameters for motor type, width, length, wheel diameter, roller angle,
-     * gear ratio, axes map, and axes sign
-     *
-   *
+    /**
+     * Constructor: USE THIS ONE FOR A REAL ROBOT!
+     * @param mType     Motor Type
+     * @param w         Wheel Base Width (inches)
+     * @param l         Wheel Base Length (inches)
+     * @param wheelDiam     Wheel Diameter (inches)
+     * @param rollerAngle   Wheel Roller Angle (degrees)
+     * @param gearRatio     Gear Ratio (motor output shaft rotations per wheel rotation)
+     * @param axesMap       Axes Map for the BNO055Enhanced
+     * @param axesSign      Axes Sign for the BNO055Enhanced
      */
-
     public MecBot(MotorType mType, float w, float l, float wheelDiam, float rollerAngle, float gearRatio, BNO055Enhanced.AxesMap axesMap, BNO055Enhanced.AxesSign axesSign){
         MOTOR_TYPE = mType;
         TAN_ALPHA = (float)Math.tan(Math.toRadians(rollerAngle));
@@ -107,6 +103,9 @@ public class MecBot {
         TICKS_PER_ROTATION = (float)mType.ticksPerRotation;
     }
 
+    /**
+     *  No-argument constructor:  USE THIS ONE FOR THE SIMULATOR!!
+     */
     public MecBot(){
         MOTOR_TYPE = MotorType.NeverestOrbital20;
         TAN_ALPHA = 1;
@@ -129,10 +128,9 @@ public class MecBot {
         backRight = hwMap.get(DcMotor.class, "back_right_motor");
 
         /*
-         * TODO: Need to set the motor mode
+         * Either the right or the left motors need to have their directions reversed, depending upon
+         * the MotorType
          */
-
-
         if(MOTOR_TYPE.reversed){
             frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
             backRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -141,6 +139,10 @@ public class MecBot {
             backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
+        /*
+         * Set Mode of all four drive motors to RUN_USING_ENCODER. That way, calls to setPower result in PIDF
+         * control to keep the motor at the specified speed (as a fraction of Max), rather than raw power.
+         */
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -148,27 +150,29 @@ public class MecBot {
 
         imu = hwMap.get(BNO055Enhanced.class, "imu");
 
-        /*
-         * TODO: Make this a BNO055Enhanced.Parameters, and use the appropriate axes map and sign
-         */
         BNO055Enhanced.Parameters parameters = new BNO055Enhanced.Parameters();
-        parameters.accelerationIntegrationAlgorithm = null;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.calibrationData = null;
-        parameters.calibrationDataFile = "";
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        parameters.calibrationDataFile = "BN055Cali.json";
         parameters.loggingEnabled = false;
-        parameters.loggingTag = "Who cares.";
+        parameters.loggingTag = "IMU";
         parameters.axesMap = AXES_MAP;
         parameters.axesSign = AXES_SIGN;
 
         imu.initialize(parameters);
     }
 
+    /**
+     * Return current robot position and orientation as a Pose object
+     * @return robot pose
+     */
     public Pose getPose() {
         return pose;
     }
 
+    /*
+     * Methods that provide access to the individual motors, mainly needed for diagnostics
+     */
     public DcMotor getBackLeft() {return backLeft;}
     public DcMotor getFrontLeft() {return frontLeft;}
     public DcMotor getFrontRight() {return frontRight;}
@@ -216,11 +220,6 @@ public class MecBot {
     }
 
     /**
-     * Get the current Hue, Saturation, and Value from the Color Sensor
-     * @return
-     */
-
-    /**
      * Set the drive powers for the forward, rotation, and strafe directions. Note that these powers are in
      * the range of -1 to +1, and represent the FRACTION of maximal possible drive speed in each direction.
      * @param px    rightward strafe (robot-X-axis) power
@@ -252,9 +251,6 @@ public class MecBot {
      * @param va    Rotation speed in radians/sec (counter-clockwise if positive)
      */
     public void setDriveSpeed(float vx, float vy, float va){
-        /*
-         * TODO: Adjust the px calculation to take roller angle into account
-         */
         float px = (vx / WHEEL_CIRCUMFERENCE) * TICKS_PER_ROTATION *GEAR_RATIO / (MAX_TICKS_PER_SECOND * TAN_ALPHA);
         float py = (vy / WHEEL_CIRCUMFERENCE) * TICKS_PER_ROTATION * GEAR_RATIO / MAX_TICKS_PER_SECOND;
         float pa = (WL_AVG * va / WHEEL_CIRCUMFERENCE) * TICKS_PER_ROTATION * GEAR_RATIO / MAX_TICKS_PER_SECOND;
@@ -319,8 +315,6 @@ public class MecBot {
 
         /*
          * Determine small increment of robot motion in ROBOT COORDINATE SYSTEM
-         *
-         * TODO: Adjust the dXR calculation to take roller angle into account
          */
         float dXR = 0.25f * (-sBL + sFL - sFR + sBR) * TAN_ALPHA;
         float dYR = 0.25f * (sBL + sFL + sFR + sBR) * TAN_ALPHA;
