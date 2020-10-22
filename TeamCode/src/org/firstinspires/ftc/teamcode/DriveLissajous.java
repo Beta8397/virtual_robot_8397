@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.teamcode.mecbot.MecBot;
 import org.firstinspires.ftc.teamcode.mecbot.MecBotAutonomous;
-import org.firstinspires.ftc.teamcode.util.ParametricFunction;
+import org.firstinspires.ftc.teamcode.util.ParametricFunction2D;
 
 @Autonomous(name="DriveLissajous", group="MechBot")
 public class DriveLissajous extends MecBotAutonomous {
@@ -17,7 +17,7 @@ public class DriveLissajous extends MecBotAutonomous {
         super.setBot(bot);
         waitForStart();
         bot.setPose(40, 0, 90);
-        driveFunction(40, 0, new ParametricFunction() {
+        driveFunction(40, 0, new ParametricFunction2D() {
             float kx = 5f;
             float ky = 4f;
             @Override
