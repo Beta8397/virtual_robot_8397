@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.teamcode.mecbot.MecBot;
 import org.firstinspires.ftc.teamcode.mecbot.MecBotAutonomous;
-import org.firstinspires.ftc.teamcode.util.CubicSpline;
+import org.firstinspires.ftc.teamcode.util.CubicSpline2D;
 
 @Autonomous(name = "DriveSpline", group="MechBot")
 public class DriveSpline extends MecBotAutonomous {
@@ -26,7 +26,8 @@ public class DriveSpline extends MecBotAutonomous {
          */
 
         float[] points = new float[]{-48, -48, -24, 24, 0, 0, 24, -24, 48, 48};
-        CubicSpline spline = new CubicSpline(points, 90, 90);
+        //float[] points = new float[]{-36, -36, -36, 36, 36, 36, 36, -36, -36, -36};
+        CubicSpline2D spline = new CubicSpline2D(points, 90, 90);
 
         waitForStart();
 
@@ -34,6 +35,7 @@ public class DriveSpline extends MecBotAutonomous {
          * Must reset odometry to indicate starting robot position and heading.
          */
         bot.setPose(-48, -48, 90);
+        //bot.setPose(-36, -36, 135);
 
         driveSpline(24, false, spline);
     }

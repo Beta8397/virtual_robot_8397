@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.mecbot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.teamcode.util.AngleUtils;
-import org.firstinspires.ftc.teamcode.util.CubicSpline;
-import org.firstinspires.ftc.teamcode.util.ParametricFunction;
+import org.firstinspires.ftc.teamcode.util.CubicSpline2D;
+import org.firstinspires.ftc.teamcode.util.ParametricFunction2D;
 
 /**
  * An abstract class that extends LinearOpMode and provides navigation methods that can be called by autonomous op modes
@@ -99,15 +99,14 @@ public abstract class MecBotAutonomous extends LinearOpMode {
     }
 
 
-    protected void driveSpline(float speed, boolean reverse, CubicSpline spline) {
+    protected void driveSpline(float speed, boolean reverse, CubicSpline2D spline) {
         spline.setIndex(0);
         float s0 = 0;
         speed = (float) Math.abs(speed);
-        System.out.println("driveSpline: " + spline.getNumSegments() + " segments.");
         while (opModeIsActive()) {
             bot.updateOdometry();
-            s0 = spline.nextClosestPt(bot.getPose().x, bot.getPose().y, s0, this);
 
+            s0 = spline.nextClosestPt(bot.getPose().x, bot.getPose().y, s0, this);
 
             if (s0 >= 1 && spline.getIndex() == (spline.getNumSegments() - 1)) break;
             VectorF targetPos = spline.p(s0);
@@ -131,7 +130,7 @@ public abstract class MecBotAutonomous extends LinearOpMode {
         bot.setDriveSpeed(0, 0, 0);
     }
 
-    protected void driveFunction(float speed, float s0, ParametricFunction pf, Predicate finish) {
+    protected void driveFunction(float speed, float s0, ParametricFunction2D pf, Predicate finish) {
         while (opModeIsActive()) {
             bot.updateOdometry();
             if (finish.isTrue()) break;
@@ -159,7 +158,7 @@ public abstract class MecBotAutonomous extends LinearOpMode {
         return new VectorF(vField.get(0) * sinTheta - vField.get(1) * cosTheta, vField.get(0) * cosTheta + vField.get(1) * sinTheta);
     }
 
-    protected float findClosestPt(float x0, float y0, float s0, ParametricFunction pf) {
+    protected float findClosestPt(float x0, float y0, float s0, ParametricFunction2D pf) {
         float epsilon = .0001f;
         float delta = 100;
         while(delta > epsilon && opModeIsActive()) {

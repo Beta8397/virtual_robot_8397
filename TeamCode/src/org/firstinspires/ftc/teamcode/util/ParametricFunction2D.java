@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.util;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 
-public interface ParametricFunction {
-    float p(float s);
-    float d1(float s);
-    float d2(float s);
+public interface ParametricFunction2D {
+    VectorF p(float s);
+    VectorF d1(float s);
+    VectorF d2(float s);
 }
