@@ -23,6 +23,8 @@ public class BetaLog {
     private static final String defaultPath = "/sdcard/BetaLog.txt";
     private static ElapsedTime elapsedTime = null;
 
+    private static boolean initialized = false;
+
     //Instantiate bufferedWriter and write the header. If this fails, close the bufferedWriter, then
     //set it to null.
 
@@ -32,14 +34,18 @@ public class BetaLog {
      * @return True if successful, otherwise false.
      */
     public static boolean initialize(){
-        return true;
-//        elapsedTime = new ElapsedTime();
-//        GregorianCalendar gregorianCalendar = new GregorianCalendar();
-//        String header = String.format("BETA_LOG_INITIALIZED: %04d:%02d:%02d %02d:%02d:%02d:%03d",
-//                gregorianCalendar.get(Calendar.YEAR), gregorianCalendar.get(Calendar.MONTH)+1,
-//                gregorianCalendar.get(Calendar.DAY_OF_MONTH), gregorianCalendar.get(Calendar.HOUR_OF_DAY),
-//                gregorianCalendar.get(Calendar.MINUTE), gregorianCalendar.get(Calendar.SECOND),
-//                gregorianCalendar.get(Calendar.MILLISECOND));
+        initialized = true;
+        elapsedTime = new ElapsedTime();
+        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+        String header = String.format("BETA_LOG_INITIALIZED: %04d:%02d:%02d %02d:%02d:%02d:%03d",
+                gregorianCalendar.get(Calendar.YEAR), gregorianCalendar.get(Calendar.MONTH)+1,
+                gregorianCalendar.get(Calendar.DAY_OF_MONTH), gregorianCalendar.get(Calendar.HOUR_OF_DAY),
+                gregorianCalendar.get(Calendar.MINUTE), gregorianCalendar.get(Calendar.SECOND),
+                gregorianCalendar.get(Calendar.MILLISECOND));
+        writeLine("");
+        writeLine("");
+        writeLine("");
+        writeLine(header);
 //        try {
 //            bufferedWriter = new BufferedWriter(new FileWriter(defaultPath, true));
 //            bufferedWriter.newLine();
@@ -51,13 +57,14 @@ public class BetaLog {
 //            close();
 //            return false;
 //        }
-//        return true;
+        return true;
     }
 
     /**
      * Close the bufferedWriter, then set it to null.
      */
     public static void close(){
+        initialized = false;
 //        if (bufferedWriter != null){
 //            try{
 //                bufferedWriter.close();
@@ -73,6 +80,8 @@ public class BetaLog {
 
     //Write a string to the log file, followed by a new line
     private static void writeLine(String string){
+        if (!initialized) return;
+        System.out.println(string);
 //        if (bufferedWriter == null) return;
 //        try{
 //            bufferedWriter.write(string, 0, string.length());
@@ -122,8 +131,10 @@ public class BetaLog {
 
     //Write message to the log file, preceeded by elapsed time (since initialization) in seconds
     private static void internalLog( String message ){
+        if (!initialized) return;
 //        if (bufferedWriter == null) return;
-//        String string = String.format("  %.4f %s", elapsedTime.seconds(), message);
+        String string = String.format("  %.4f %s", elapsedTime.seconds(), message);
+        writeLine(string);
 //        try{
 //            bufferedWriter.write(string, 0, string.length());
 //            bufferedWriter.newLine();
