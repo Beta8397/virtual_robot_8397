@@ -1,5 +1,7 @@
 package com.qualcomm.robotcore.eventloop.opmode;
 
+import virtual_robot.config.Config;
+
 /**
  * Virtual Robot's implementation of LinearOpMode
  *
@@ -42,7 +44,7 @@ public abstract class LinearOpMode extends OpMode {
         // Otherwise, yield back our thread scheduling quantum and give other threads at
         // our priority level a chance to run
         try{
-            Thread.sleep(0,1);
+            Thread.sleep(Config.OPMODE_LOOP_DELAY_MILLISECONDS, Config.OPMODE_LOOP_DELAY_NANOSECONDS);
         } catch(InterruptedException e){
             Thread.currentThread().interrupt();
         }

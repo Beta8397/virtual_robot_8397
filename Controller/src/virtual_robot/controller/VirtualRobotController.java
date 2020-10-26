@@ -93,8 +93,11 @@ public class VirtualRobotController {
     private Thread opModeThread = null;
 
     //Virtual Robot Control Engine
-    ScheduledExecutorService executorService = null;
-    public static final double TIMER_INTERVAL_MILLISECONDS = 33;
+    ScheduledExecutorService robotExecutorService = null;
+
+    //Display Engine
+    ScheduledExecutorService displayExecutorService = null;
+
 
     //Telemetry
     private volatile String telemetryText;
@@ -415,15 +418,22 @@ public class VirtualRobotController {
                     updateTelemetryDisplay();
                 }
             };
-            Runnable singleCycle = new Runnable() {
+            Runnable singleRobotCycle = new Runnable() {
                 @Override
                 public void run() {
-                    bot.updateStateAndSensors(TIMER_INTERVAL_MILLISECONDS);
+                    bot.updateStateAndSensors(Config.ROBOT_TIMER_INTERVAL_MILLISECONDS);
+                }
+            };
+            Runnable singleDisplayCycle = new Runnable() {
+                @Override
+                public void run() {
                     Platform.runLater(updateDisplay);
                 }
             };
-            executorService = Executors.newSingleThreadScheduledExecutor();
-            executorService.scheduleAtFixedRate(singleCycle, 0, 33, TimeUnit.MILLISECONDS);
+            robotExecutorService = Executors.newSingleThreadScheduledExecutor();
+            robotExecutorService.scheduleAtFixedRate(singleRobotCycle, 0, (long) Config.ROBOT_TIMER_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
+            displayExecutorService = Executors.newSingleThreadScheduledExecutor();
+            displayExecutorService.scheduleAtFixedRate(singleDisplayCycle, 0, (long) Config.DISPLAY_TIMER_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
             opModeThread.start();
         }
         else if (!opModeStarted){
@@ -446,7 +456,8 @@ public class VirtualRobotController {
              *   -In a linear opmode, the above will cause stopRequested to become true, and interrupt runOpMode thread
              */
             opModeStarted = false;
-            if (!executorService.isShutdown()) executorService.shutdown();
+            if (!robotExecutorService.isShutdown()) robotExecutorService.shutdown();
+            if (!displayExecutorService.isShutdown()) displayExecutorService.shutdown();
             /*
              * This should not be necessary, but...
              */
@@ -487,7 +498,7 @@ public class VirtualRobotController {
                 opMode.internalPostInitLoop();
 
                 try {
-                    Thread.sleep(0, 1);
+                    Thread.sleep(Config.OPMODE_LOOP_DELAY_MILLISECONDS, Config.OPMODE_LOOP_DELAY_NANOSECONDS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -511,7 +522,7 @@ public class VirtualRobotController {
                 opMode.internalPostLoop();
 
                 try {
-                    Thread.sleep(0, 1);
+                    Thread.sleep(Config.OPMODE_LOOP_DELAY_MILLISECONDS, Config.OPMODE_LOOP_DELAY_NANOSECONDS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -529,13 +540,13 @@ public class VirtualRobotController {
 
         bot.getHardwareMap().setActive(false);
         bot.powerDownAndReset();
-        if (!executorService.isShutdown()) executorService.shutdown();
+        if (!robotExecutorService.isShutdown()) robotExecutorService.shutdown();
+        if (!displayExecutorService.isShutdown()) displayExecutorService.shutdown();
         opModeInitialized = false;
         opModeStarted = false;
         Platform.runLater(new Runnable() {
             public void run() {
                 driverButton.setText("INIT");
-                //resetGamePad();
                 initializeTelemetryTextArea();
                 cbxConfig.setDisable(false);
                 if (Config.USE_VIRTUAL_GAMEPAD) virtualGamePadController.resetGamePad();

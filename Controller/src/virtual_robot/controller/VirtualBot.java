@@ -140,6 +140,8 @@ public abstract class VirtualBot {
      *  it SHOULD NOT make changes to the robot's graphical UI. Those changes should be made by
      *  overriding the updateDisplay() method, which is run on the UI thread.
      *
+     *  updateStateAndSensors should be synchronized.
+     *
      *  @param millis milliseconds since the previous update
      */
     public abstract void updateStateAndSensors(double millis);
@@ -174,10 +176,6 @@ public abstract class VirtualBot {
     public synchronized void positionWithMouseClick(MouseEvent arg){
 
         if (arg.getButton() == MouseButton.PRIMARY) {
-//            double argX = Math.max(halfBotWidth, Math.min(fieldWidth - halfBotWidth, arg.getX()));
-//            double argY = Math.max(halfBotWidth, Math.min(fieldWidth - halfBotWidth, arg.getY()));
-//            x = argX - halfFieldWidth;
-//            y = halfFieldWidth - argY;
             x = arg.getX() - halfFieldWidth;
             y = halfFieldWidth - arg.getY();
             constrainToBoundaries();

@@ -13,11 +13,12 @@ And: Addition of new Swerve robot configuration.
 This is a JavaFX application developed using the (free) IntelliJ IDEA Community Edition IDE. The repository can be downloaded
 and unzipped, then opened with IntelliJ. It can also be run using Android Studio (see this [video](https://www.youtube.com/watch?v=pmaT9Twbmao)).
 
-Six robot configurations are available: a simple two-wheeled robot, a robot with four mecanum wheels, an
+Eight robot configurations are available: a simple two-wheeled robot, a robot with four mecanum wheels, an
 X-Drive robot with four OmniWheels mounted at 45 degrees at each corner of the robot, a mecanum-wheeled 
 configuration that has an extendable arm with a grabber at the end, a mecanum-wheeled configuration with
-three "Dead-wheel" encoders for odometry, and a swerve-drive robot with four swerve units (each with a drive
-motor, a cr-servo for steering, and an encoder to monitor steering).
+three "Dead-wheel" encoders for odometry, a mecanum-wheeled configuration with a turret that rotates and elevates,
+a swerve-drive robot with four swerve units (each with a drive motor, a cr-servo for steering, and an encoder to
+monitor steering), and a differential swerve drive robot (with two DC motors for each differential swerve unit).
 
 Each robot can be thought of as 18 inches wide.  For the two-wheel bot and mecanum wheel bots, the distance between
 the centers of the right and left wheels is 16 inches. For the mecanum wheel bots, the distance between the centers
@@ -88,6 +89,12 @@ To use:
 
 
 LOG OF CHANGES
+
+CHANGES 10/3/2020
+    Courtesy of Alan Smith/FTC Team 16072, new robot configuration with mecanum wheels and a turret that rotates
+    and elevates. Robot update loop and Display update loop moved to separate timers/threads, and constants added to
+    the Config.java file to set the period for these loops, and also to set the delay between iterations of loops
+    in op modes (i.e, between calls to loop(), init_loop(), and within opModeIsActive()).
 
 CHANGES 9/20/2020
     Added Swerve robot configuration. Each of four swerve units has: a DcMotor for drive, a CR-Servo for steering,

@@ -37,4 +37,17 @@ public class Config {
      * default behavior.
      */
     public static final boolean HOLD_CONTROLS_BY_DEFAULT = true;
+
+    /**
+     * Timer intervals for the robot control cycle and the display cycle.
+     */
+    public static final double ROBOT_TIMER_INTERVAL_MILLISECONDS = 10;
+    public static final double DISPLAY_TIMER_INTERVAL_MILLISECONDS = 33;
+
+    /**
+     * Loop Delay Time for OpModes (i.e., the delay between calls to loop() and init_loop() for a regular op mode,
+     * and the delay added in the opModeIsActive() method for a linear op mode.
+     */
+    public static final long OPMODE_LOOP_DELAY_MILLISECONDS = 10;
+    public static final int OPMODE_LOOP_DELAY_NANOSECONDS = 0;
 }
